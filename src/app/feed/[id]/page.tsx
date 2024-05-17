@@ -33,7 +33,7 @@ const getTopicDetails = async (
   }
 };
 
-const showDetails = ({ params }: { params: { id: string } }) => {
+const ShowDetails = ({ params }: { params: { id: string } }) => {
   const { id } = params;
   const [topic, setTopic] = useState<Topic | null>(null);
 
@@ -73,4 +73,4 @@ const showDetails = ({ params }: { params: { id: string } }) => {
   );
 };
 
-export default showDetails;
+export default ShowDetails;
