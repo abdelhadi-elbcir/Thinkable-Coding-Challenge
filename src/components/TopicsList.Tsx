@@ -13,9 +13,9 @@ interface Topic {
   createdAt: string;
 }
 
-const getTopics = async (): Promise<{ topics: Topic[] }> => {
+const getTopics = async (page = 1, limit = 3): Promise<{ topics: Topic[], total: number, page: number, pages: number }> => {
   try {
-    const res = await fetch("http://localhost:3000/api/topics", {
+    const res = await fetch(`http://localhost:3000/api/topics?page=${page}&limit=${limit}`, {
       cache: "no-store",
     });
     if (!res.ok) {
@@ -24,21 +24,24 @@ const getTopics = async (): Promise<{ topics: Topic[] }> => {
     return res.json();
   } catch (error) {
     console.log("Error loading topics: ", error);
-    return { topics: [] };
+    return { topics: [], total: 0, page: 1, pages: 1 };
   }
 };
 
 export default function TopicsList() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     const fetchTopics = async () => {
-      const { topics } = await getTopics();
+      const { topics, pages } = await getTopics(page);
       setTopics(topics.reverse());
+      setTotalPages(pages);
     };
     fetchTopics();
-  }, []);
+  }, [page]);
 
   const filteredTopics = topics.filter((topic) =>
     topic.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -51,7 +54,7 @@ export default function TopicsList() {
           type="text"
           placeholder="Search By Title"
           value={searchTerm}
-          style={{margin:"10px" , padding:"5px"}}
+          style={{ margin: "10px", padding: "5px" }}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full p-3 mb-6 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -59,7 +62,7 @@ export default function TopicsList() {
           {filteredTopics.map((t) => (
             <div
               key={t._id}
-              style={{margin:"10px" , padding:"5px"}}
+              style={{ margin: "10px", padding: "5px" }}
               className="p-6 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
             >
               <div className="flex justify-between items-center mb-4">
@@ -92,6 +95,23 @@ export default function TopicsList() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="flex justify-between items-center mt-6">
+          <button
+            disabled={page <= 1}
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            className="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-md shadow-sm transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <span>Page {page} of {totalPages}</span>
+          <button
+            disabled={page >= totalPages}
+            onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+            className="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-md shadow-sm transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>

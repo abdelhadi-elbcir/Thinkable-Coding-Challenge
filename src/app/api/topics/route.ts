@@ -1,6 +1,6 @@
 import connectMongoDB from "@/libs/mongodb";
 import Topic from "@/models/topic";
-import { NextResponse } from "next/server";
+import {NextRequest, NextResponse } from "next/server";
 
 interface TopicData {
   title: string;
@@ -31,10 +31,19 @@ export async function POST(request: { json: () => Promise<TopicData> }) {
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest): Promise<NextResponse> {
   await connectMongoDB();
-  const topics = await Topic.find();
-  return NextResponse.json({ topics });
+  
+  const url = new URL(request.url);
+  const searchParams = url.searchParams;
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = parseInt(searchParams.get('limit') || '3', 10);
+  const skip = (page - 1) * limit;
+
+  const total = await Topic.countDocuments();
+  const topics = await Topic.find().skip(skip).limit(limit);
+
+  return NextResponse.json({ topics, total, page, pages: Math.ceil(total / limit) });
 }
 
 export async function DELETE(request: { nextUrl: URL }) {
