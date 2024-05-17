@@ -16,7 +16,7 @@ export default function RemoveBtn({ id }:RemoveBtnProps) {
       const res = await fetch(`http://localhost:3000/api/topics?id=${id}`, {
         method: "DELETE",
       });
-
+      window.location.reload();
       if (res.ok) {
         router.refresh();
       }
