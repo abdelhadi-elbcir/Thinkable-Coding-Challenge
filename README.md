@@ -1,36 +1,171 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Project Thinkable
+
+This project is a Next.js application that provides APIs for managing Blog topics. It includes functionalities to create, retrieve, update, and delete topics in a MongoDB database.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- [Node.js](https://nodejs.org/en/download/) (version 14.x or later)
+- [npm](https://www.npmjs.com/get-npm) (version 6.x or later)
+- [MongoDB](https://www.mongodb.com/try/download/community) (local installation or a cloud instance)
 
 ## Getting Started
 
-First, run the development server:
+### Installation
 
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/abdelhadi-elbcir/Thinkable-Coding-Challenge.git
+   cd project-thinkable
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Running the Application
+
+1. Start your MongoDB server if it's not already running.
+
+2. Create a `.env.local` file in the root directory of your project and add your MongoDB connection string:
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/your-database-name
+   ```
+
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+   Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Building for Production
+
+To build the application for production, run:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This will create an optimized production build.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Running Tests
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+1. Ensure you have the necessary dev dependencies installed:
+   ```bash
+   npm install --save-dev jest ts-jest @types/jest mongodb-memory-server mongoose
+   ```
 
-## Learn More
+2. Run the tests:
+   ```bash
+   npm test
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+## API Documentation
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Create a Topic
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+**Endpoint**: `POST /api/topics`
 
-## Deploy on Vercel
+**Request Body**:
+```json
+{
+  "title": "string",
+  "description": "string",
+  "category": "string",
+  "content": "string"
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Response**:
+- `201 Created`:
+  ```json
+  {
+    "message": "Topic Created"
+  }
+  ```
+- `500 Internal Server Error`:
+  ```json
+  {
+    "message": "Error creating topic"
+  }
+  ```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Retrieve All Topics
+
+**Endpoint**: `GET /api/topics`
+
+**Response**:
+- `200 OK`:
+  ```json
+  {
+    "topics": [
+      {
+        "title": "string",
+        "description": "string",
+        "category": "string",
+        "content": "string"
+      }
+    ]
+  }
+  ```
+
+### Retrieve a Topic by ID
+
+**Endpoint**: `GET /api/topics/:id`
+
+**Response**:
+- `200 OK`:
+  ```json
+  {
+    "topic": {
+      "_id": "string",
+      "title": "string",
+      "description": "string",
+      "category": "string",
+      "content": "string"
+    }
+  }
+  ```
+- `404 Not Found`:
+  ```json
+  {
+    "error": "Topic not found"
+  }
+  ```
+
+### Update a Topic
+
+**Endpoint**: `PUT /api/topics/:id`
+
+**Request Body**:
+```json
+{
+  "newTitle": "string",
+  "newDescription": "string",
+  "newContent": "string",
+  "newCategory": "string"
+}
+```
+
+**Response**:
+- `200 OK`:
+  ```json
+  {
+    "message": "Topic updated"
+  }
+  ```
+
+### Delete a Topic
+
+**Endpoint**: `DELETE /api/topics/:id`
+
+**Response**:
+- `200 OK`:
+  ```json
+  {
+    "message": "Topic deleted"
+  }
+  ```
+```
