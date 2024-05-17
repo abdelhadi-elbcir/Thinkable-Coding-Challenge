@@ -1,6 +1,7 @@
 import connectMongoDB from "@/libs/mongodb";
 import Topic from "@/models/topic";
 import { POST, GET, DELETE } from "../app/api/topics/route";
+import { PUT } from "@/app/api/topics/[id]/route";
 
 jest.mock("@/libs/mongodb");
 jest.mock("@/models/topic");
@@ -96,6 +97,27 @@ describe("API Tests", () => {
       const response = await DELETE(request as any);
       expect(response.status).toBe(200);
       expect(response.json()).resolves.toEqual({ message: "Topic deleted" });
+    });
+  });
+
+  describe("PUT /api/topics/:id", () => {
+    it("should update a topic", async () => {
+      const request = {
+        json: () =>
+          Promise.resolve({
+            newTitle: "Updated Title",
+            newDescription: "Updated Description",
+            newContent: "Updated Content",
+            newCategory: "Updated Category",
+          }),
+      } as any;
+      const params = { id: "12345" };
+
+      (Topic.findByIdAndUpdate as jest.Mock).mockResolvedValueOnce({});
+
+      const response = await PUT(request, { params });
+      expect(response.status).toBe(200);
+      expect(response.json()).resolves.toEqual({ message: "Topic updated" });
     });
   });
 
