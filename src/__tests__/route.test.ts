@@ -1,5 +1,6 @@
 import connectMongoDB from "@/libs/mongodb";
 import Topic from "@/models/topic";
+import { NextRequest, NextResponse } from 'next/server';
 import { POST, GET, DELETE } from "../app/api/topics/route";
 import { PUT } from "@/app/api/topics/[id]/route";
 
@@ -62,27 +63,51 @@ describe("API Tests", () => {
   });
 
   describe("GET /api/topics", () => {
-    it("should retrieve topics", async () => {
+    beforeAll(() => {
+      (connectMongoDB as jest.Mock).mockResolvedValueOnce({});
+    });
+  
+    it("should retrieve topics with pagination", async () => {
       const topics = [
         {
+          _id: "1",
           title: "Topic 1",
           description: "Description 1",
           category: "Category 1",
           content: "Content 1",
+          createdAt: new Date().toISOString(),
         },
         {
+          _id: "2",
           title: "Topic 2",
           description: "Description 2",
           category: "Category 2",
           content: "Content 2",
+          createdAt: new Date().toISOString(),
         },
       ];
-
-      (Topic.find as jest.Mock).mockResolvedValueOnce(topics);
-
-      const response = await GET();
+  
+      const mockCountDocuments = jest.fn().mockResolvedValueOnce(2);
+      const mockFind = jest.fn().mockReturnValueOnce({
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockResolvedValueOnce(topics),
+      });
+  
+      (Topic.countDocuments as jest.Mock) = mockCountDocuments;
+      (Topic.find as jest.Mock) = mockFind;
+  
+      const url = new URL('http://localhost/api/topics?page=1&limit=10');
+      const request = new NextRequest(url.toString());
+  
+      const response = await GET(request);
+  
       expect(response.status).toBe(200);
-      expect(response.json()).resolves.toEqual({ topics });
+      await expect(response.json()).resolves.toEqual({
+        topics,
+        total: 2,
+        page: 1,
+        pages: 1,
+      });
     });
   });
 
