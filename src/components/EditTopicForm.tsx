@@ -19,7 +19,7 @@ export default function EditTopicForm({ id, title, description, content, categor
 
   const router = useRouter();
 
-  const handleSubmit = async (e:any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
@@ -75,7 +75,7 @@ export default function EditTopicForm({ id, title, description, content, categor
         placeholder="Topic Category"
       />
 
-      <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded">
+      <button className="bg-yellow-500 hover:bg-yellow-600 text-black w-fit font-bold py-2 px-4 rounded">
         Save Modification
       </button>
     </form>

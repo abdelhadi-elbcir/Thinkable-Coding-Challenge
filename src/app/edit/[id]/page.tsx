@@ -1,6 +1,19 @@
 import EditTopicForm from "@/components/EditTopicForm";
 
-const getTopicById = async (id) => {
+
+interface Topic {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+}
+
+interface Params {
+  id: string;
+}
+
+const getTopicById = async (id: string): Promise<{ topic: Topic }> => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics/${id}`, {
       cache: "no-store",
@@ -13,10 +26,15 @@ const getTopicById = async (id) => {
     return res.json();
   } catch (error) {
     console.log(error);
+    throw error;
   }
 };
 
-export default async function EditTopic({ params }) {
+interface EditTopicProps {
+  params: Params;
+}
+
+export default async function EditTopic({ params }: EditTopicProps) {
   const { id } = params;
   const { topic } = await getTopicById(id);
   const { title, description, content, category } = topic;

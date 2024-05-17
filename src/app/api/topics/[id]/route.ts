@@ -2,17 +2,33 @@ import connectMongoDB from "@/libs/mongodb";
 import Topic from "@/models/topic";
 import { NextResponse } from "next/server";
 
-export async function PUT(request, { params }) {
+
+export async function PUT(request: Request, { params }: { params: { id: string } }) {
   const { id } = params;
-  const { newTitle: title, newDescription: description } = await request.json();
+  const { newTitle, newDescription, newContent, newCategory } = await request.json();
+
   await connectMongoDB();
-  await Topic.findByIdAndUpdate(id, { title, description });
+
+  await Topic.findByIdAndUpdate(id, {
+    title: newTitle,
+    description: newDescription,
+    content: newContent,
+    category: newCategory,
+  });
+
   return NextResponse.json({ message: "Topic updated" }, { status: 200 });
 }
 
-export async function GET(request, { params }) {
+export async function GET(request: Request, { params }: { params: { id: string } }) {
   const { id } = params;
+
   await connectMongoDB();
-  const topic = await Topic.findOne({ _id: id });
+
+  const topic = await Topic.findById(id);
+
+  if (!topic) {
+    return NextResponse.json({ error: "Topic not found" }, { status: 404 });
+  }
+
   return NextResponse.json({ topic }, { status: 200 });
 }
