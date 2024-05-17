@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 interface EditTopicFormProps {
   id: string;
@@ -18,6 +20,10 @@ export default function EditTopicForm({ id, title, description, content, categor
   const [newCategory, setNewCategory] = useState(category);
 
   const router = useRouter();
+
+  const handleContentChange = (value: string) => {
+    setNewContent(value);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,10 +66,10 @@ export default function EditTopicForm({ id, title, description, content, categor
         placeholder="Topic Description"
       />
 
-      <textarea
-        onChange={(e) => setNewContent(e.target.value)}
+      <ReactQuill
         value={newContent}
-        className="border border-slate-500 px-8 py-2"
+        onChange={handleContentChange}
+        className="px-8 py-2"
         placeholder="Topic Content"
       />
 

@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import sanitizeHtml from "sanitize-html";
 
 interface Topic {
   _id: string;
@@ -11,7 +12,13 @@ interface Topic {
   createdAt: string;
 }
 
-const getTopicDetails = async (topicId: string): Promise<Topic | null> => {
+interface GetTopicDetailsResponse {
+  topic: Topic;
+}
+
+const getTopicDetails = async (
+  topicId: string
+): Promise<GetTopicDetailsResponse | null> => {
   try {
     const res = await fetch(`http://localhost:3000/api/topics/${topicId}`, {
       cache: "no-store",
@@ -34,8 +41,9 @@ const showDetails = ({ params }: { params: { id: string } }) => {
     const fetchTopicDetails = async () => {
       if (id) {
         const topicDetails = await getTopicDetails(id);
-        console.log(topicDetails.topic);
-        setTopic(topicDetails.topic);
+        if (topicDetails?.topic) {
+          setTopic(topicDetails.topic);
+        }
       }
     };
     fetchTopicDetails();
@@ -55,7 +63,16 @@ const showDetails = ({ params }: { params: { id: string } }) => {
         <span className="font-semibold">Created at:</span>{" "}
         {new Date(topic.createdAt).toLocaleDateString()}
       </div>
-      <div className="mb-4">{topic.content}</div>
+      <div
+        className="mb-4"
+        dangerouslySetInnerHTML={{
+          __html: sanitizeHtml(topic.content, {
+            allowedAttributes: {
+              a: ["href"],
+            },
+          }),
+        }}
+      ></div>
     </div>
   );
 };

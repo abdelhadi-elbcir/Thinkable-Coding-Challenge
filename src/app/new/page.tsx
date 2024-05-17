@@ -1,7 +1,8 @@
 "use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 interface TopicFormData {
   title: string;
@@ -17,8 +18,21 @@ export default function AddTopic() {
     category: "",
     content: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const router = useRouter();
+
+  const handleChange = (name: string, value: string) => {
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  };
+
+  const handleContentChange = (value: string) => {
+    handleChange("content", value);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,9 +40,12 @@ export default function AddTopic() {
     const { title, description, category, content } = formData;
 
     if (!title || !description || !category || !content) {
-      alert("Title, description, category, and content are required.");
+      setError("Title, description, category, and content are required.");
       return;
     }
+
+    setLoading(true);
+    setError("");
 
     try {
       const res = await fetch("http://localhost:3000/api/topics", {
@@ -41,29 +58,28 @@ export default function AddTopic() {
 
       if (res.ok) {
         router.push("/");
+        // Reset form fields
+        setFormData({
+          title: "",
+          description: "",
+          category: "",
+          content: "",
+        });
       } else {
         throw new Error("Failed to create a topic");
       }
     } catch (error) {
-      console.log(error);
+      setError("An error occurred. Please try again later.");
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prevFormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
       <input
         name="title"
-        onChange={handleChange}
+        onChange={(e) => handleChange(e.target.name, e.target.value)}
         value={formData.title}
         className="border border-slate-500 px-8 py-2"
         type="text"
@@ -72,7 +88,7 @@ export default function AddTopic() {
 
       <input
         name="description"
-        onChange={handleChange}
+        onChange={(e) => handleChange(e.target.name, e.target.value)}
         value={formData.description}
         className="border border-slate-500 px-8 py-2"
         type="text"
@@ -81,7 +97,7 @@ export default function AddTopic() {
 
       <select
         name="category"
-        onChange={handleChange}
+        onChange={(e) => handleChange(e.target.name, e.target.value)}
         value={formData.category}
         className="border border-slate-500 px-8 py-2"
       >
@@ -91,19 +107,21 @@ export default function AddTopic() {
         <option value="Art">Art</option>
       </select>
 
-      <textarea
-        name="content"
-        onChange={handleChange}
+      <ReactQuill
         value={formData.content}
-        className="border border-slate-500 px-8 py-2"
+        onChange={handleContentChange}
+        className="px-8 py-2"
         placeholder="Topic Content"
       />
+
+      {error && <p className="text-red-500">{error}</p>}
 
       <button
         type="submit"
         className="bg-yellow-500 hover:bg-yellow-600 text-black w-fit font-bold py-2 px-4 rounded"
+        disabled={loading}
       >
-        Save
+        {loading ? "Saving..." : "Save"}
       </button>
     </form>
   );

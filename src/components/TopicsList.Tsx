@@ -37,7 +37,7 @@ export default function TopicsList() {
   useEffect(() => {
     const fetchTopics = async () => {
       const { topics, pages } = await getTopics(page);
-      setTopics(topics.reverse());
+      setTopics(topics);
       setTotalPages(pages);
     };
     fetchTopics();
@@ -50,6 +50,7 @@ export default function TopicsList() {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto">
+        
         <input
           type="text"
           placeholder="Search By Title"
@@ -100,7 +101,8 @@ export default function TopicsList() {
           <button
             disabled={page <= 1}
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            className="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-md shadow-sm transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{backgroundColor:"rgb(234, 179, 8)"}}
+            className="bg-yellow-200 hover:bg-yellow-300 text-black font-bold py-2 px-4 rounded-md shadow-sm transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Previous
           </button>
@@ -108,7 +110,8 @@ export default function TopicsList() {
           <button
             disabled={page >= totalPages}
             onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-            className="bg-gray-200 hover:bg-gray-300 text-black font-bold py-2 px-4 rounded-md shadow-sm transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{backgroundColor:"rgb(234, 179, 8)"}}
+            className="bg-yellow-200 hover:bg-yellow-300 text-black font-bold py-2 px-4 rounded-md shadow-sm transition-transform transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>
