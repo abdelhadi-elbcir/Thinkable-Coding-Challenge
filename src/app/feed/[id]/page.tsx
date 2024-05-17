@@ -66,11 +66,7 @@ const showDetails = ({ params }: { params: { id: string } }) => {
       <div
         className="mb-4"
         dangerouslySetInnerHTML={{
-          __html: sanitizeHtml(topic.content, {
-            allowedAttributes: {
-              a: ["href"],
-            },
-          }),
+          __html: sanitizeHtml(topic.content)
         }}
       ></div>
     </div>
